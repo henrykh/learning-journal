@@ -65,7 +65,7 @@ nav a.selected, nav a:hover{color: #FFF; opacity: 1;}
 
 
 /*Post list styling */
-#posts li a {
+#posts li a, #postDetail, #newPostForm {
     display: block;
     min-height: 2em;
     background-color: #fff;
@@ -82,7 +82,7 @@ nav a.selected, nav a:hover{color: #FFF; opacity: 1;}
 }
 
 /*post detail */
-#postDetail{
+/*#postDetail{
     display: block;
     min-height: 2em;
     background-color: #fff;
@@ -92,10 +92,14 @@ nav a.selected, nav a:hover{color: #FFF; opacity: 1;}
     padding: 1em;
     border-radius: 5px;
 }
-
+*/
 #postDetailHeader{
     border-bottom: solid 1px lightgray;
     margin-bottom: 1em;
 }
 
+#editPost{
+    color: gray;
+    float: right;
+}
 
