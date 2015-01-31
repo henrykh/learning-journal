@@ -1,0 +1,101 @@
+ul{
+    list-style: none;
+}
+
+
+html{
+    font-family: 'Open Sans', sans-serif;
+    background: url(assets/diablo.jpg) no-repeat center center fixed;
+    background-size: cover;
+}
+
+body{
+    margin: 0;
+}
+
+a, a:visited{
+    text-decoration: none;
+    color: #FFF;
+}
+
+header{
+    height: 10em;
+    display: block;
+    /*background: linear-gradient(to bottom, #eb6d1c, orange);*/
+    margin-bottom: 5em;
+}
+
+#headerTitle{
+    float: left;
+    margin: 0 0 0 5%;
+    color: #fff;
+}
+#headerTitle h1, #headerTitle h2{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+
+
+
+/* navigation */
+nav {
+    /*background-color: orange;*/
+    text-decoration: none;
+    float: right;
+    margin: 0 5% 0 0;
+}
+
+nav li{
+    display: inline-block;
+    margin-right: 10px;
+}
+
+nav a {opacity: 0.8;}
+nav a.selected, nav a:hover{color: #FFF; opacity: 1;}
+
+
+
+
+
+#content{
+    margin: 0 auto;
+    max-width: 740px;
+}
+
+
+/*Post list styling */
+#posts li a {
+    display: block;
+    min-height: 2em;
+    background-color: #fff;
+    opacity: 0.8;
+    margin-bottom: 1em;
+    color: gray;
+    padding: 1em;
+    border-radius: 5px;
+}
+
+
+.postDate{
+    float: right;
+}
+
+/*post detail */
+#postDetail{
+    display: block;
+    min-height: 2em;
+    background-color: #fff;
+    opacity: 0.8;
+    margin-bottom: 1em;
+    color: gray;
+    padding: 1em;
+    border-radius: 5px;
+}
+
+#postDetailHeader{
+    border-bottom: solid 1px lightgray;
+    margin-bottom: 1em;
+}
+
+
