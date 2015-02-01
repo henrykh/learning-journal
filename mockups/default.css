@@ -18,10 +18,11 @@ a, a:visited{
     color: #FFF;
 }
 
+
+/* header styling */
 header{
     height: 10em;
     display: block;
-    /*background: linear-gradient(to bottom, #eb6d1c, orange);*/
     margin-bottom: 5em;
 }
 
@@ -30,11 +31,14 @@ header{
     margin: 0 0 0 5%;
     color: #fff;
 }
+
 #headerTitle h1, #headerTitle h2{
-    margin-top: 0;
     margin-bottom: 0;
 }
 
+#headerTitle h2{
+    margin-top: 0;
+}
 
 
 
@@ -43,7 +47,7 @@ nav {
     /*background-color: orange;*/
     text-decoration: none;
     float: right;
-    margin: 0 5% 0 0;
+    margin: 0.67em 5% 0 0;
 }
 
 nav li{
@@ -54,7 +58,21 @@ nav li{
 nav a {opacity: 0.8;}
 nav a.selected, nav a:hover{color: #FFF; opacity: 1;}
 
+/*footer styling*/
+footer{
+    font-size: 0.75em;
+    text-align: right;
+    clear: both;
+    position: absolute;
+    bottom: 1em;
+    right: 5em;
+    color: lightgray;
+}
 
+i.fa {
+    font-size: 2em;
+    margin-right: 5px;
+}
 
 
 
@@ -65,7 +83,7 @@ nav a.selected, nav a:hover{color: #FFF; opacity: 1;}
 
 
 /*Post list styling */
-#posts li a, #postDetail, #newPostForm {
+#posts li a, #postDetail, #newPostForm, #editPostForm {
     display: block;
     min-height: 2em;
     background-color: #fff;
@@ -102,4 +120,12 @@ nav a.selected, nav a:hover{color: #FFF; opacity: 1;}
     color: gray;
     float: right;
 }
+
+textarea {
+    width: 99%;
+    min-height: 10em;
+    resize: vertical;
+}
+
+
 
