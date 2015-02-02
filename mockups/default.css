@@ -81,6 +81,13 @@ i.fa {
     max-width: 740px;
 }
 
+#createNew a{
+    opacity: 0.8;
+    border-radius: 5px;
+    padding: 5px;
+    float:right;
+
+}
 
 /*Post list styling */
 #posts li a, #postDetail, #newPostForm, #editPostForm {
@@ -90,7 +97,7 @@ i.fa {
     opacity: 0.8;
     margin-bottom: 1em;
     color: gray;
-    padding: 1em;
+    padding: 1em 1em 2em 1em;
     border-radius: 5px;
 }
 
