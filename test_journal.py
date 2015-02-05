@@ -2,6 +2,7 @@
 from contextlib import closing
 from pyramid import testing
 import pytest
+import os
 
 from journal import connect_db
 from journal import DB_SCHEMA
@@ -65,6 +66,31 @@ def req_context(db, request):
 
         # after a test has run, we clear out entries for isolation
         clear_entries(settings)
+
+@pytest.fixture(scope='function')
+def app(db):
+    from journal import main
+    from webtest import TestApp
+    os.environ['DATABASE_URL'] = TEST_DSN
+    app = main()
+    return TestApp(app)
+
+@pytest.fixture(scope='function')
+def entry(db, request):
+    """provide a single entry in the database"""
+    settings = db
+    now = datetime.datetime.utcnow()
+    expected = ('Test Title', 'Test Text', now)
+    with closing(connect_db(settings)) as db:
+        run_query(db, INSERT_ENTRY, expected, False)
+        db.commit()
+
+    def cleanup():
+        clear_entries(settings)
+
+    request.addfinalizer(cleanup)
+
+    return expected
 
 def test_write_entry(req_context):
     from journal import write_entry
@@ -148,3 +174,17 @@ def test_read_entries_ordered(req_context):
     assert len(result['entries']) == 3
     for idx, entry in enumerate(result['entries']):
         assert ordered[idx][2] == entry['created'] 
+
+def test_empty_listing(app):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    expected = 'No entries here so far'
+    assert expected in actual
+
+def test_listing(app, entry):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    for expected in entry[:2]:
+        assert expected in actual

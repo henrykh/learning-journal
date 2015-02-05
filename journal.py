@@ -32,10 +32,15 @@ SELECT id, title, text, created FROM entries ORDER BY created DESC
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
+@view_config(route_name='home', renderer='templates/list.jinja2')
+def read_entries(request):
+    """return a list of all entries as dicts"""
+    cursor = request.db.cursor()
+    cursor.execute(DB_ENTRIES_LIST)
+    keys = ('id', 'title', 'text', 'created')
+    entries = [dict(zip(keys, row)) for row in cursor.fetchall()]
+    return {'entries': entries}
 
-@view_config(route_name='home', renderer='string')
-def home(request):
-    return "Hello World"
 
 def connect_db(settings):
     """Return a connection to the configured database"""
@@ -103,15 +108,6 @@ if __name__ == '__main__':
     app = main()
     port = os.environ.get('PORT', 5000)
     serve(app, host='0.0.0.0', port=port)
-
-
-def read_entries(request):
-    """return a list of all entries as dicts"""
-    cursor = request.db.cursor()
-    cursor.execute(DB_ENTRIES_LIST)
-    keys = ('id', 'title', 'text', 'created')
-    entries = [dict(zip(keys, row)) for row in cursor.fetchall()]
-    return {'entries': entries}
 
 
 def write_entry(request):
