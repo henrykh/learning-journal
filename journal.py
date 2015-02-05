@@ -3,6 +3,7 @@
 import psycopg2
 import os
 import logging
+import datetime
 from pyramid.config import Configurator
 from pyramid.events import NewRequest, subscriber
 from pyramid.session import SignedCookieSessionFactory
@@ -18,6 +19,14 @@ CREATE TABLE IF NOT EXISTS entries (
     text TEXT NOT NULL,
     created TIMESTAMP NOT NULL
 )
+"""
+
+INSERT_ENTRY = """
+INSERT INTO entries (title, text, created) VALUES (%s, %s, %s)
+"""
+
+DB_ENTRIES_LIST = """
+SELECT id, title, text, created FROM entries ORDER BY created DESC
 """
 
 logging.basicConfig()
@@ -93,3 +102,20 @@ if __name__ == '__main__':
     app = main()
     port = os.environ.get('PORT', 5000)
     serve(app, host='0.0.0.0', port=port)
+
+
+def read_entries(request):
+    """return a list of all entries as dicts"""
+    cursor = request.db.cursor()
+    cursor.execute(DB_ENTRIES_LIST)
+    keys = ('id', 'title', 'text', 'created')
+    entries = [dict(zip(keys, row)) for row in cursor.fetchall()]
+    return {'entries': entries}
+
+
+def write_entry(request):
+    """write a single entry to the database"""
+    title = request.params.get('title', None)
+    text = request.params.get('text', None)
+    created = datetime.datetime.utcnow()
+    request.db.cursor().execute(INSERT_ENTRY, [title, text, created])
