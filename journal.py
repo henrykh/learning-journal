@@ -10,11 +10,13 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.events import NewRequest, subscriber
 from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
+from pyramid.security import remember, forget
 from pyramid.session import SignedCookieSessionFactory
 from pyramid.view import view_config
 from waitress import serve
 from contextlib import closing
 
+here = os.path.dirname(os.path.abspath(__file__))
 
 DB_SCHEMA = """
 CREATE TABLE IF NOT EXISTS entries (
@@ -36,6 +38,7 @@ SELECT id, title, text, created FROM entries ORDER BY created DESC
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
+
 @view_config(route_name='home', renderer='templates/list.jinja2')
 def read_entries(request):
     """return a list of all entries as dicts"""
@@ -44,6 +47,7 @@ def read_entries(request):
     keys = ('id', 'title', 'text', 'created')
     entries = [dict(zip(keys, row)) for row in cursor.fetchall()]
     return {'entries': entries}
+
 
 def write_entry(request):
     """write a single entry to the database"""
@@ -63,9 +67,38 @@ def add_entry(request):
     return HTTPFound(request.route_url('home'))
 
 
+@view_config(route_name='login', renderer="templates/login.jinja2")
+def login(request):
+    username = request.params.get('username', '')
+    error = ''
+
+    if request.method == 'POST':
+        error = 'Login Failed'
+        authenticated = False
+        try:
+            authenticated = do_login(request)
+        except ValueError as e:
+            error = str(e)
+
+        if authenticated:
+            headers = remember(request, username)
+            return HTTPFound(request.route_url('home'),
+                             headers=headers)
+
+    return {'error': error, 'username': username}
+
+
+@view_config(route_name='logout')
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(request.route_url('home'),
+                     headers=headers)
+
+
 def connect_db(settings):
     """Return a connection to the configured database"""
     return psycopg2.connect(settings['db'])
+
 
 def init_db():
     """Create database dables defined by DB_SCHEMA
@@ -145,8 +178,11 @@ def main():
         authorization_policy=ACLAuthorizationPolicy(),
     )
     config.include('pyramid_jinja2')
+    config.add_static_view('static', os.path.join(here, 'static'))
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
     config.scan()
     app = config.make_wsgi_app()
     return app
