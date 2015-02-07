@@ -39,7 +39,7 @@ logging.basicConfig()
 log = logging.getLogger(__file__)
 
 
-@view_config(route_name='home', renderer='templates/list.jinja2')
+@view_config(route_name='home', renderer='templates/list2.jinja2')
 def read_entries(request):
     """return a list of all entries as dicts"""
     cursor = request.db.cursor()

@@ -1,0 +1,126 @@
+ul{
+    list-style: none;
+}
+
+
+html{
+    font-family: 'Open Sans', sans-serif;
+    background: url(diablo.jpg) no-repeat center center fixed;
+    background-size: cover;
+}
+
+body{
+    margin: 0;
+}
+
+a, a:visited{
+    text-decoration: none;
+    color: #FFF;
+}
+
+
+/* header styling */
+header{
+    height: 10em;
+    display: block;
+    margin-bottom: 5em;
+}
+
+#headerTitle{
+    float: left;
+    margin: 0 0 0 5%;
+    color: #fff;
+}
+
+#headerTitle h1, #headerTitle h2{
+    margin-bottom: 0;
+}
+
+#headerTitle h2{
+    margin-top: 0;
+}
+
+
+
+/* navigation */
+nav {
+    /*background-color: orange;*/
+    text-decoration: none;
+    float: right;
+    margin: 0.67em 5% 0 0;
+}
+
+nav li{
+    display: inline-block;
+    margin-right: 10px;
+}
+
+nav a {opacity: 0.8;}
+nav a.selected, nav a:hover{color: #FFF; opacity: 1;}
+
+/*footer styling*/
+footer{
+    font-size: 0.75em;
+    text-align: right;
+    clear: both;
+    position: absolute;
+    bottom: 1em;
+    right: 5em;
+    color: lightgray;
+}
+
+i.fa {
+    font-size: 2em;
+    margin-right: 5px;
+}
+
+
+
+#content{
+    margin: 0 auto;
+    max-width: 740px;
+}
+
+#createNew a{
+    opacity: 0.8;
+    border-radius: 5px;
+    padding: 5px;
+    float:right;
+
+}
+
+/*Post list styling */
+article.entry, #postDetail, #newPostForm, #editPostForm {
+    display: block;
+    min-height: 2em;
+    background-color: #fff;
+    opacity: 0.8;
+    margin-bottom: 1em;
+    color: gray;
+    padding: 1em 1em 2em 1em;
+    border-radius: 5px;
+}
+
+
+.dateline{
+    float: right;
+}
+
+#postDetailHeader{
+    border-bottom: solid 1px lightgray;
+    margin-bottom: 1em;
+}
+
+#editPost{
+    color: gray;
+    float: right;
+}
+
+textarea {
+    width: 99%;
+    min-height: 10em;
+    resize: vertical;
+}
+
+
+
