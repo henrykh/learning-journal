@@ -2,7 +2,7 @@
 <html>
     <head>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="static/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="static/normalize.css">
     <link rel="stylesheet" type="text/css" href="static/default.css">
     <title>Learning Journal</title>
@@ -10,7 +10,7 @@
 
     <body>
         <header>
-            <a href="index.html" id="headerTitle">
+            <a href="{{ request.route_url('home') }}" id="headerTitle">
                 <h1>Learning Journal</h1>
                 <h2>Henry Howes</h2>
             </a>

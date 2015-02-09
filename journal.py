@@ -67,6 +67,11 @@ def add_entry(request):
     return HTTPFound(request.route_url('home'))
 
 
+@view_config(route_name='new', renderer='templates/new.jinja2')
+def new_entry_form(request):
+    return {'test': 'test'}
+
+
 @view_config(route_name='login', renderer="templates/login.jinja2")
 def login(request):
     username = request.params.get('username', '')
@@ -181,6 +186,7 @@ def main():
     config.add_static_view('static', os.path.join(here, 'static'))
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('new', '/new')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.scan()
