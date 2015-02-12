@@ -3,7 +3,7 @@
   {% for entry in entries%}
   <article class="entry" id="entry={{entry.id}}">
     {% if request.authenticated_userid %}
-      <h3 class="entryTitle"><a href= "{{ request.route_url('editview', id=entry.id) }}">{{ entry.title }}</a></h3>
+      <h3 class="entryTitle"><a href= "{{ request.route_url('edit', id=entry.id) }}">{{ entry.title }}</a></h3>
     {% else %}
       <h3>{{ entry.title }}</h3>
     {% endif %}

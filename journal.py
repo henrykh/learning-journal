@@ -56,6 +56,7 @@ def read_entries(request):
     entries = [dict(zip(keys, row)) for row in cursor.fetchall()]
     return {'entries': entries}
 
+
 @view_config(route_name='detail', renderer='templates/detail.jinja2')
 def read_entry(request):
     """return a list of all entries as dicts"""
@@ -67,8 +68,9 @@ def read_entry(request):
         item['text'] = markdown.markdown(item['text'], extensions=['codehilite', 'fenced_code'])
     return {'entries': entries}
 
-@view_config(route_name='editview', renderer='templates/edit.jinja2')
-def editview_entry(request):
+
+@view_config(route_name='edit', renderer='templates/edit.jinja2')
+def edit_entry_view(request):
     """return a list of all entries as dicts"""
     cursor = request.db.cursor()
     cursor.execute(DB_ENTRY, (request.matchdict['id'], ))
@@ -239,7 +241,7 @@ def main():
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('detail', '/detail/{id}')
-    config.add_route('editview', '/editview/{id}')
+    config.add_route('edit', '/edit/{id}')
     config.scan()
     app = config.make_wsgi_app()
     return app
