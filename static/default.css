@@ -72,9 +72,9 @@ footer{
     color: lightgray;
 }
 
-i.fa {
+span.fa {
     font-size: 2em;
-    margin-right: 5px;
+    /*margin-right: 5px;*/
 }
 
 
@@ -84,11 +84,9 @@ i.fa {
     max-width: 740px;
 }
 
-#createNew a{
+#createNew{
     opacity: 0.8;
-    border-radius: 5px;
-    padding: 5px;
-    float:right;
+    text-align: right;
 
 }
 
@@ -104,7 +102,11 @@ article.entry, #postDetail, #newPostForm, #editPostForm {
     border-radius: 5px;
 }
 
-#entryTitle{
+.entryTitle{
+    margin-top: 0
+}
+
+.entryTitle a{
     color: gray;
 }
 
