@@ -18,6 +18,10 @@ a, a:visited{
     color: #FFF;
 }
 
+h1, h2 {
+    color: #FFF;
+    opacity: 0.8;
+}
 
 /* header styling */
 header{
@@ -63,9 +67,8 @@ footer{
     font-size: 0.75em;
     text-align: right;
     clear: both;
-    position: absolute;
-    bottom: 1em;
-    right: 5em;
+    /*position: absolute;*/
+    margin-right: 5em;
     color: lightgray;
 }
 
@@ -101,6 +104,9 @@ article.entry, #postDetail, #newPostForm, #editPostForm {
     border-radius: 5px;
 }
 
+#entryTitle{
+    color: gray;
+}
 
 .dateline{
     float: right;
