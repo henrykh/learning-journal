@@ -69,7 +69,7 @@ def add_entry(request):
 
 @view_config(route_name='new', renderer='templates/new.jinja2')
 def new_entry_form(request):
-    return {'test': 'test'}
+    return {'': ''}
 
 
 @view_config(route_name='login', renderer="templates/login.jinja2")
