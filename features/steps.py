@@ -97,13 +97,13 @@ def the_post(step, id):
 @step('when I enter the url /detail/(\d+)')
 def test_detail_listing(step, id):
     ''' Get the entry values. '''
-    # Add a entyr into the database for testing.
+    # Add a entry into the database for testing.
     world.entry = world.add_entry(world.app, 'Test Title', 'Test Text')
     world.response = world.app.get('/detail/{}'.format(id))
 
 
 @step('Then I see the detail page and the content of that post')
-def detial_compare(step):
+def detail_compare(step):
     ''' Check if we can see the detail page if it contains the data. '''
     assert world.response.status_code == 200
 
@@ -118,7 +118,7 @@ def the_edit(step, id):
     world.number = int(id)
 
 
-@step('when I enter the url /editview/(\d+)')
+@step('when I enter the url /edit/(\d+)')
 def test_edit_listing(step, id):
     ''' Get the entry values. '''
     # Add a entry into the database to edit for testing.
@@ -132,7 +132,7 @@ def test_edit_listing(step, id):
     login_helper(username, password, world.app)
 
     world.response_post = world.app.post(
-        '/editview/{}'.format(id), params=world.entry_data, status='3*')
+        '/edit/{}'.format(id), params=world.entry_data, status='3*')
     world.response_get = world.app.get('/detail/{}'.format(id))
 
 

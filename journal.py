@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import psycopg2
 import os
 import logging
@@ -28,12 +27,10 @@ CREATE TABLE IF NOT EXISTS entries (
 )
 """
 
-INSERT_ENTRY = """
-INSERT INTO entries (title, text, created) VALUES (%s, %s, %s)
+INSERT_ENTRY = """INSERT INTO entries (title, text, created) VALUES (%s, %s, %s)
 """
 
-DB_ENTRIES_LIST = """
-SELECT id, title, text, created FROM entries ORDER BY created DESC
+DB_ENTRIES_LIST = """SELECT id, title, text, created FROM entries ORDER BY created DESC
 """
 
 DB_ENTRY = """SELECT * FROM entries WHERE id=%s
@@ -240,7 +237,6 @@ def main():
     config.include('pyramid_jinja2')
     config.add_static_view('static', os.path.join(here, 'static'))
     config.add_route('home', '/')
-    # config.add_route('add', '/add')
     config.add_route('new', '/new')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')

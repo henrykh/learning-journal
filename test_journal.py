@@ -233,7 +233,7 @@ def test_post_to_add_view(app):
         'title': 'Hello there',
         'text': 'This is a post',
     }
-    response = app.post('/add', params=entry_data, status='3*')
+    response = app.post('/new', params=entry_data, status='3*')
     redirected = response.follow()
     actual = redirected.body
     for expected in entry_data.values():
@@ -247,7 +247,7 @@ def test_post_to_add_view_get(app):
         'text': 'This is a post',
     }
     with pytest.raises(BaseException) as excinfo:
-        response = app.get('/add', params=entry_data, status='3*')
+        response = app.get('/new', params=entry_data, status='3*')
         redirected = response.follow()
         actual = redirected.body
         for expected in entry_data.values():
@@ -263,7 +263,7 @@ def test_post_to_add_view_unauthorized(app):
     }
 
     with pytest.raises(AppError):
-        app.post('/add', params=entry_data, status='3*')
+        app.post('/new', params=entry_data, status='3*')
 
 
 def test_post_to_edit_view(app, entry, req_context):
@@ -276,7 +276,7 @@ def test_post_to_edit_view(app, entry, req_context):
 
     item = run_query(req_context.db, READ_ENTRY)
 
-    response = app.post('/editview/{}'.format(item[0][0]), params=entry_data, status='3*')
+    response = app.post('/edit/{}'.format(item[0][0]), params=entry_data, status='3*')
     redirected = response.follow()
     actual = redirected.body
     for expected in entry_data.values():
@@ -295,7 +295,7 @@ def test_post_to_edit_view_unauthorized(app, entry, req_context):
     item = run_query(req_context.db, READ_ENTRY)
 
     with pytest.raises(AppError):
-        app.post('/editview/{}'.format(item[0][0]), params=entry_data, status='3*')
+        app.post('/edit/{}'.format(item[0][0]), params=entry_data, status='3*')
 
 
 def test_do_login_success(auth_req):

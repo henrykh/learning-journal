@@ -7,7 +7,7 @@ Feature: Editing
 
     Scenario: Edit view
         Given that I want to edit post 1
-        When I enter the url /editview/1
+        When I enter the url /edit/1
         Then I can see the new edit page and edit the entry
 
     Scenario: Add Markdown to a post
