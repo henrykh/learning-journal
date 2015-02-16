@@ -11,10 +11,15 @@ import datetime
 from journal import INSERT_ENTRY
 
 from cryptacular.bcrypt import BCRYPTPasswordManager
+from webtest import AppError
+import unittest
+import markdown
 
 TEST_DSN = 'dbname=test_learning_journal user=henryhowes'
-
 INPUT_BTN = '<input type="submit" value="Share" name="Share"/>'
+READ_ENTRY = """SELECT * FROM entries
+"""
+
 
 def init_db(settings):
     with closing(connect_db(settings)) as db:
@@ -43,6 +48,7 @@ def run_query(db, query, params=(), get_results=True):
         results = cursor.fetchall()
     return results
 
+
 @pytest.fixture(scope='session')
 def db(request):
     """set up and tear down a database"""
@@ -55,6 +61,7 @@ def db(request):
     request.addfinalizer(cleanup)
 
     return settings
+
 
 @pytest.yield_fixture(scope='function')
 def req_context(db, request):
@@ -69,13 +76,22 @@ def req_context(db, request):
         # after a test has run, we clear out entries for isolation
         clear_entries(settings)
 
+
 @pytest.fixture(scope='function')
-def app(db):
+def app(db, request):
     from journal import main
     from webtest import TestApp
     os.environ['DATABASE_URL'] = TEST_DSN
     app = main()
+
+    def cleanup():
+        settings = {'db': TEST_DSN}
+        clear_entries(settings)
+
+    request.addfinalizer(cleanup)
+
     return TestApp(app)
+
 
 @pytest.fixture(scope='function')
 def entry(db, request):
@@ -123,7 +139,7 @@ def test_write_entry(req_context):
     rows = run_query(req_context.db, "SELECT * FROM entries")
     assert len(rows) == 0
 
-    result = write_entry(req_context)
+    write_entry(req_context)
     # manually commit so we can see the entry on query
     req_context.db.commit()
 
@@ -136,13 +152,12 @@ def test_write_entry(req_context):
 
 def test_write_entry_without_text(req_context):
     from journal import write_entry
-    req_context.params = {'title' : 'Test Title'}
+    req_context.params = {'title': 'Test Title'}
 
     # test whether passing a null value throws an integrity error
     with pytest.raises(BaseException):
         write_entry(req_context)
     req_context.db.commit()
-
 
 
 def test_read_entries_empty(req_context):
@@ -194,7 +209,7 @@ def test_read_entries_ordered(req_context):
     assert 'entries' in result
     assert len(result['entries']) == 3
     for idx, entry in enumerate(result['entries']):
-        assert ordered[idx][2] == entry['created'] 
+        assert ordered[idx][2] == entry['created']
 
 
 def test_empty_listing(app):
@@ -239,6 +254,48 @@ def test_post_to_add_view_get(app):
             assert expected in actual
 
     assert 'Bad response: 404 Not Found' in str(excinfo.value)
+
+
+def test_post_to_add_view_unauthorized(app):
+    entry_data = {
+        'title': 'Hello there',
+        'text': 'This is a post',
+    }
+
+    with pytest.raises(AppError):
+        app.post('/add', params=entry_data, status='3*')
+
+
+def test_post_to_edit_view(app, entry, req_context):
+    entry_data = {
+        'title': 'Hello there',
+        'text': 'This is a post',
+    }
+    username, password = ('admin', 'secret')
+    login_helper(username, password, app)
+
+    item = run_query(req_context.db, READ_ENTRY)
+
+    response = app.post('/editview/{}'.format(item[0][0]), params=entry_data, status='3*')
+    redirected = response.follow()
+    actual = redirected.body
+    for expected in entry_data.values():
+        assert expected in actual
+
+
+def test_post_to_edit_view_unauthorized(app, entry, req_context):
+    entry_data = {
+        'title': 'Hello there',
+        'text': 'This is a post',
+    }
+
+    username, password = ('admin', 'wrong')
+    login_helper(username, password, app)
+
+    item = run_query(req_context.db, READ_ENTRY)
+
+    with pytest.raises(AppError):
+        app.post('/editview/{}'.format(item[0][0]), params=entry_data, status='3*')
 
 
 def test_do_login_success(auth_req):
@@ -308,3 +365,19 @@ def test_logout(app):
     assert response.status_code == 200
     actual = response.body
     assert INPUT_BTN not in actual
+
+
+class TestCodeHilite(unittest.TestCase):
+
+    def test_exists(self):
+        self.pygexists = True
+        try:
+            import pygments
+        except ImportError:
+            self.pygexists = False
+
+    def test_codehilite(self):
+
+        text = '\t# This should look like a comment'
+        md = markdown.Markdown(extentions=['codehilite', 'fenced_code'])
+        self.assertTrue(md.convert(text).startswith('<div class="codehilite"><pre>'))
