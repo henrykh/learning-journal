@@ -1,0 +1,22 @@
+{% extends "index.jinja2" %}
+{% block body %}
+  {% if request.authenticated_userid %}
+  {% for entry in entries %}
+  <aside>
+  <form action="{{ request.route_url('edit', id=entry.id) }}" method="POST" class="edit_entry">
+    <div class="field">
+      <label for="title">Title</label>
+      <input type="text" value="{{entry.title}}" size="30" name="title" id="title"/>
+    </div>
+    <div class="field">
+      <label for="text">Text</label>
+      <textarea name="text" id="text" rows="5" cols="80">{{entry.text}}</textarea>
+    </div>
+    <div class="control_row">
+      <input type="submit" value="Share" name="Share"/>
+    </div>
+  </form>
+  </aside>
+  {% endfor %}
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/normalize.css">
+    <link rel="stylesheet" type="text/css" href="/static/codehilite.css">
+    <link rel="stylesheet" type="text/css" href="/static/default.css">
+    <title>Learning Journal</title>
+    </head>
+
+    <body>
+        <header>
+            <a href="{{ request.route_url('home') }}" id="headerTitle">
+                <h1>Learning Journal</h1>
+                <h2>Henry Howes</h2>
+            </a>
+            <nav>
+                <ul>
+                    <li><a class="selected" href="{{ request.route_url('home') }}">Home</a></li>
+                    {% if not request.authenticated_userid %}
+                      <li><a href="{{ request.route_url('login') }}">Log In</a></li>
+                    {% else %}
+                      <li><a href="{{ request.route_url('logout') }}">Log Out</a></li>
+                    {% endif %}
+                    <!-- <li><a href="detail.html">Detail</a></li>
+                    <li><a href="new.html">New Post</a></li>
+                    <li><a href="edit.html">Edit Post</a></li> -->
+                </ul>
+            </nav>
+           <!--  <aside id="user-controls">
+                <ul>
+                {% if not request.authenticated_userid %}
+                  <li><a href="{{ request.route_url('login') }}">log in</a></li>
+                {% else %}
+                  <li><a href="{{ request.route_url('logout') }}">log out</a></li>
+                {% endif %}
+                </ul>
+          </aside> -->
+        </header>
+        <div id="content">
+              <section id="posts">
+              {% block body %}{% endblock %}
+              </section>
+        </div>
+           <!--  <ul id="posts">
+                <li>
+                    <a href="detail.html">
+                        <span class="postTitle">Post 1</span>
+                        <span class="postDate">January 30</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="detail.html">
+                        <span class="postTitle">Post 2</span>
+                        <span class="postDate">January 31</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="detail.html">
+                        <span class="postTitle">Post 3</span>
+                        <span class="postDate">February 1</span>
+                    </a>
+                </li>
+            </ul> -->
+        <!-- <div id="createNew">
+            <a href="new.html"><i class="fa fa-plus-circle"></i></a>
+        </div> -->
+        <footer>
+            <a href="https://github.com/henrykh" target="_blank"><span class="fa fa-github"></span></a>
+            <span class="fa fa-linkedin"></span>
+            <p>&copy; 2015 Henry Howes</p>
+        </footer>
+    </body>
+
+</html>

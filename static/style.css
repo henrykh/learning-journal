@@ -9,7 +9,8 @@ header{
 header:after{
     content:"";
     display:table;
-    clear:both;}
+    clear:both;
+}
 header a{
     text-decoration:none}
 header aside{

@@ -1,0 +1,22 @@
+{% extends "index.jinja2" %}
+{% block body %}
+  {% if request.authenticated_userid %}
+  <div id="createNew">
+    <a href="{{ request.route_url('new') }}"><span class="fa fa-plus-circle"></span></a>
+  </div>
+  {% endif %}
+  <h2>Entries</h2>
+  {% for entry in entries %}
+  <article class="entry" id="entry={{entry.id}}">
+     <h3 class="entryTitle"><a href= "{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
+    <p class="dateline">{{ entry.created.strftime('%b. %d, %Y') }}
+    <div class="entry_body">
+      {{ entry.text|safe }}
+    </div>
+  </article>
+  {% else %}
+  <div class="entry">
+    <p><em>No entries here so far</em></p>
+  </div>
+  {% endfor %}
+{% endblock %}
