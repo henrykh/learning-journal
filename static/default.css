@@ -2,6 +2,13 @@ ul{
     list-style: none;
 }
 
+.entry_body ul{
+    list-style: initial;
+}
+
+.entry_body h1, h2, h3 {
+    color: gray;
+}
 
 html{
     font-family: 'Open Sans', sans-serif;
