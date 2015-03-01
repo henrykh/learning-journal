@@ -2,18 +2,13 @@
 from contextlib import closing
 from pyramid import testing
 import pytest
-import os
-
 from journal import connect_db
 from journal import DB_SCHEMA
-
 import datetime
 from journal import INSERT_ENTRY
-
+import os
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from webtest import AppError
-import unittest
-import markdown
 
 TEST_DSN = 'dbname=test_learning_journal user=henryhowes'
 INPUT_BTN = '<input type="submit" value="Share" name="Share"/>'
@@ -129,35 +124,29 @@ def auth_req(request):
     return req
 
 
-def test_write_entry(req_context):
-    from journal import write_entry
-    fields = ('title', 'text')
-    expected = ('Test Title', 'Test Text')
-    req_context.params = dict(zip(fields, expected))
-
-    # assert that there are no entries when we start
-    rows = run_query(req_context.db, "SELECT * FROM entries")
-    assert len(rows) == 0
-
-    write_entry(req_context)
-    # manually commit so we can see the entry on query
-    req_context.db.commit()
-
-    rows = run_query(req_context.db, "SELECT title, text FROM entries")
-    assert len(rows) == 1
-    actual = rows[0]
-    for idx, val in enumerate(expected):
-        assert val == actual[idx]
+def test_empty_listing(app):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    expected = 'No entries here so far'
+    assert expected in actual
 
 
-def test_write_entry_without_text(req_context):
-    from journal import write_entry
-    req_context.params = {'title': 'Test Title'}
+def test_listing(app, entry):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    for expected in entry[:2]:
+        assert expected in actual
 
-    # test whether passing a null value throws an integrity error
-    with pytest.raises(BaseException):
-        write_entry(req_context)
-    req_context.db.commit()
+
+def test_detail_listing(app, entry, req_context):
+    item = run_query(req_context.db, READ_ENTRY)
+    response = app.get('/detail/{}'.format(item[0][0]))
+    assert response.status_code == 200
+    actual = response.body
+    for expected in entry[:2]:
+        assert expected in actual
 
 
 def test_read_entries_empty(req_context):
@@ -182,50 +171,81 @@ def test_read_entries(req_context):
     assert len(result['entries']) == 1
     for entry in result['entries']:
         assert expected[0] == entry['title']
-        assert expected[1] == entry['text']
+        assert '<p>{}</p>'.format(expected[1]) == entry['text']
         for key in 'id', 'created':
             assert key in entry
 
 
-def test_read_entries_ordered(req_context):
+def test_read_entry(req_context):
     # prepare data for testing
     now = datetime.datetime.utcnow()
-    later = datetime.datetime.utcnow()
-    latest = datetime.datetime.utcnow()
-
-    first = ('Test Title1', 'Test Text1', now)
-    second = ('Test Title2', 'Test Text2', later)
-    third = ('Test Title3', 'Test Text3', latest)
-    ordered = [third, second, first]
-
-    run_query(req_context.db, INSERT_ENTRY, first, False)
-    run_query(req_context.db, INSERT_ENTRY, second, False)
-    run_query(req_context.db, INSERT_ENTRY, third, False)
-
-    # call the function under test
-    from journal import read_entries
-    result = read_entries(req_context)
+    expected = ('Test Title', 'Test Text', now)
+    run_query(req_context.db, INSERT_ENTRY, expected, False)
+    item = run_query(req_context.db, READ_ENTRY)
+    req_context.matchdict = {'id': item[0][0]}
+    from journal import read_entry
+    result = read_entry(req_context)
     # make assertions about the result
-    assert 'entries' in result
-    assert len(result['entries']) == 3
-    for idx, entry in enumerate(result['entries']):
-        assert ordered[idx][2] == entry['created']
+
+    assert 'entry' in result
+    assert len(result['entry']) == 4
+
+    assert expected[0] == result['entry']['title']
+    assert '<p>{}</p>'.format(expected[1]) == result['entry']['text']
+    for key in 'id', 'created':
+        assert key in result['entry']
 
 
-def test_empty_listing(app):
-    response = app.get('/')
-    assert response.status_code == 200
-    actual = response.body
-    expected = 'No entries here so far'
-    assert expected in actual
+def test_write_entry(req_context):
+    from journal import write_entry
+    fields = ('title', 'text')
+    expected = ('Test Title', 'Test Text')
+    req_context.params = dict(zip(fields, expected))
+
+    # assert that there are no entries when we start
+    rows = run_query(req_context.db, READ_ENTRY)
+    assert len(rows) == 0
+
+    write_entry(req_context)
+    # manually commit so we can see the entry on query
+    req_context.db.commit()
+
+    rows = run_query(req_context.db, "SELECT title, text FROM entries")
+    assert len(rows) == 1
+    actual = rows[0]
+    for idx, val in enumerate(expected):
+        assert val == actual[idx]
 
 
-def test_listing(app, entry):
-    response = app.get('/')
-    assert response.status_code == 200
-    actual = response.body
-    for expected in entry[:2]:
-        assert expected in actual
+def test_edit_entry(req_context):
+    from journal import edit_entry
+    from journal import write_entry
+
+    fields = ('title', 'text')
+    original = ('Test Title', 'Test Text')
+    req_context.params = dict(zip(fields, original))
+    write_entry(req_context)
+    req_context.db.commit()
+
+    rows = run_query(req_context.db, READ_ENTRY)
+    assert len(rows) == 1
+    actual = rows[0][1:3]
+    for idx, val in enumerate(original):
+        assert val == actual[idx]
+
+    req_context.matchdict = {'id': rows[0][0]}
+
+    expected = ('New Title', 'New Text')
+    req_context.params = dict(zip(fields, expected))
+    edit_entry(req_context)
+    req_context.db.commit()
+
+    rows = run_query(req_context.db, "SELECT title, text FROM entries")
+    assert len(rows) == 1
+
+    actual = rows[0]
+    for idx, val in enumerate(expected):
+        assert val == actual[idx]
 
 
 def test_post_to_add_view(app):
@@ -233,27 +253,13 @@ def test_post_to_add_view(app):
         'title': 'Hello there',
         'text': 'This is a post',
     }
-    response = app.post('/new', params=entry_data, status='3*')
+    username, password = ('admin', 'secret')
+    login_helper(username, password, app)
+    response = app.post('/add', params=entry_data, status='3*')
     redirected = response.follow()
     actual = redirected.body
     for expected in entry_data.values():
         assert expected in actual
-
-
-# tests whether sending a get request fails
-def test_post_to_add_view_get(app):
-    entry_data = {
-        'title': 'Hello there',
-        'text': 'This is a post',
-    }
-    with pytest.raises(BaseException) as excinfo:
-        response = app.get('/new', params=entry_data, status='3*')
-        redirected = response.follow()
-        actual = redirected.body
-        for expected in entry_data.values():
-            assert expected in actual
-
-    assert 'Bad response: 404 Not Found' in str(excinfo.value)
 
 
 def test_post_to_add_view_unauthorized(app):
@@ -263,7 +269,7 @@ def test_post_to_add_view_unauthorized(app):
     }
 
     with pytest.raises(AppError):
-        app.post('/new', params=entry_data, status='3*')
+        app.post('/add', params=entry_data, status='3*')
 
 
 def test_post_to_edit_view(app, entry, req_context):
@@ -276,7 +282,8 @@ def test_post_to_edit_view(app, entry, req_context):
 
     item = run_query(req_context.db, READ_ENTRY)
 
-    response = app.post('/edit/{}'.format(item[0][0]), params=entry_data, status='3*')
+    response = app.post('/editview/{}'.format(
+        item[0][0]), params=entry_data, status='3*')
     redirected = response.follow()
     actual = redirected.body
     for expected in entry_data.values():
@@ -295,7 +302,8 @@ def test_post_to_edit_view_unauthorized(app, entry, req_context):
     item = run_query(req_context.db, READ_ENTRY)
 
     with pytest.raises(AppError):
-        app.post('/edit/{}'.format(item[0][0]), params=entry_data, status='3*')
+        app.post('/editview/{}'.format(
+            item[0][0]), params=entry_data, status='3*')
 
 
 def test_do_login_success(auth_req):
@@ -359,6 +367,7 @@ def test_login_fails(app):
 
 
 def test_logout(app):
+    # re-use existing code to ensure we are logged in when we begin
     test_login_success(app)
     redirect = app.get('/logout', status="3*")
     response = redirect.follow()
@@ -367,17 +376,27 @@ def test_logout(app):
     assert INPUT_BTN not in actual
 
 
-class TestCodeHilite(unittest.TestCase):
+def test_post_with_markdown(app):
+    entry_data = {
+        'title': 'Hello there',
+        'text': '###Header',
+    }
+    username, password = ('admin', 'secret')
+    login_helper(username, password, app)
+    response = app.post('/add', params=entry_data, status='3*')
+    redirected = response.follow()
+    actual = redirected.body
+    assert '<h3>Header</h3>' in actual
 
-    def test_exists(self):
-        self.pygexists = True
-        try:
-            import pygments
-        except ImportError:
-            self.pygexists = False
 
-    def test_codehilite(self):
-
-        text = '\t# This should look like a comment'
-        md = markdown.Markdown(extentions=['codehilite', 'fenced_code'])
-        self.assertTrue(md.convert(text).startswith('<div class="codehilite"><pre>'))
+def test_post_with_codeblock(app):
+    entry_data = {
+        'title': 'Hello there',
+        'text': '```python\nfor i in list:\nx = y**2\nprint(x)\n```',
+    }
+    username, password = ('admin', 'secret')
+    login_helper(username, password, app)
+    response = app.post('/add', params=entry_data, status='3*')
+    redirected = response.follow()
+    actual = redirected.body
+    assert '<div class="codehilite"><pre>' in actual
