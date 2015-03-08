@@ -2,6 +2,13 @@ ul{
     list-style: none;
 }
 
+.entry_body ul{
+    list-style: initial;
+}
+
+.entry_body h1, h2, h3 {
+    color: gray;
+}
 
 html{
     font-family: 'Open Sans', sans-serif;
@@ -95,7 +102,6 @@ article.entry, #postDetail, #newPostForm, #editPostForm {
     display: block;
     min-height: 2em;
     background-color: #fff;
-    opacity: 0.9;
     margin-bottom: 1em;
     color: gray;
     padding: 1em 1em 2em 1em;
