@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS entries (
 INSERT_ENTRY = """INSERT INTO entries (title, text, created) VALUES (%s, %s, %s)
 """
 
-DB_ENTRIES_LIST = """SELECT id, title, text, created FROM entries ORDER BY created DESC
+DB_ENTRIES_LIST = """SELECT id, title, text, created FROM entries ORDER BY created DESC LIMIT 10
 """
 
 DB_ENTRY = """SELECT * FROM entries WHERE id=%s
