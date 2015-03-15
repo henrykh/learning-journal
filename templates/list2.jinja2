@@ -2,8 +2,6 @@
 {% block body %}
   {% if request.authenticated_userid %}
   <div id="createNew">
-<!--     <a href="{{ request.route_url('new') }}"><span class="fa fa-plus-circle"></span></a>
- -->
     <form action="{{ request.route_url('new') }}" method="POST" class="add_entry">
       <div class="field">
         <label for="title">Title</label>
@@ -25,7 +23,7 @@
      <h3 class="entryTitle"><a href= "{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
     <p class="dateline">{{ entry.created.strftime('%b. %d, %Y') }}
     <div class="entry_body">
-      {{ entry.text|safe }}
+      {{ entry.render_markdown()|safe }}
     </div>
   </article>
   {% else %}
